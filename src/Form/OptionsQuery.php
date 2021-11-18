@@ -36,6 +36,11 @@ class OptionsQuery
     /**
      * @var array
      */
+    protected static $cache = [];
+
+    /**
+     * @var array
+     */
     protected $data;
 
     /**
@@ -134,6 +139,10 @@ class OptionsQuery
             return $this->options;
         }
 
+        if ($cachedOptions = A::get($this->query(), static::$cache)) {
+            return $cachedOptions;
+        }
+
         $data    = $this->data();
         $query   = new Query($this->query(), $data);
         $result  = $query->result();
@@ -149,6 +158,8 @@ class OptionsQuery
                 'value' => $this->template($alias, 'value', $data)
             ];
         }
+
+        static::$cache[$this->query()] = $options;
 
         return $this->options = $options;
     }
